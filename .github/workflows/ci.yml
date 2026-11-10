@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          cd modernization/transaction-report-service
+          pip install -r requirements.txt
+          pip install pytest pytest-cov hypothesis scikit-learn
+
+      - name: Run unit tests
+        run: |
+          cd modernization/transaction-report-service
+          PYTHONPATH=src python -m pytest tests/ -q --cov=carddemo_report --cov-report=term-missing
+
+      - name: Run parity tests
+        run: |
+          PYTHONPATH=modern_python python -m pytest tests/test_parity.py -q
+
+      - name: Lint
+        run: |
+          cd modernization/transaction-report-service
+          pip install ruff
+          ruff check src/ tests/
+
+      - name: Security scan (Bandit)
+        run: |
+          cd modernization/transaction-report-service
+          pip install bandit
+          bandit -r src/ -ll -ii
+
+      - name: Dependency audit (pip-audit)
+        run: |
+          cd modernization/transaction-report-service
+          pip install pip-audit
+          pip-audit -r requirements.txt || true

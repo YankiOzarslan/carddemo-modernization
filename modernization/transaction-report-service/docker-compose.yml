@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - CARDDATA_DIR=/data
+      - PORT=8000
+    volumes:
+      - ../../app/data/ASCII:/data:ro
+    command: python -m carddemo_report.web

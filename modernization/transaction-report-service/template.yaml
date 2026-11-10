@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Modernized CardDemo transaction report (Python/AWS Lambda)
+
+Resources:
+  TransactionReportFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: carddemo_report.lambda_handler.handler
+      Runtime: python3.11
+      Timeout: 60
+      MemorySize: 256
+      Environment:
+        Variables:
+          CARDDATA_DIR: ""
+      Events:
+        ReportApi:
+          Type: Api
+          Properties:
+            Path: /report
+            Method: post
+        DailyUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref TransactionDataBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: dailytran.txt
+
+  TransactionDataBucket:
+    Type: AWS::S3::Bucket

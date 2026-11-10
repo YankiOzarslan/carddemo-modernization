@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "carddemo-transaction-report"
+version = "1.0.0"
+description = "Modernized (Python/AWS Lambda) version of CardDemo CBTRN03C transaction report"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+carddemo-report = "carddemo_report.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]

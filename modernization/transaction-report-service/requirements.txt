@@ -1,0 +1,3 @@
+# Runtime dependencies (AWS Lambda provides boto3)
+# No third-party deps required for core report logic.
+boto3>=1.28.0
